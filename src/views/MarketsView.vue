@@ -106,7 +106,7 @@ export default {
 .market {
   max-width: 1280px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 40px 60px;
 
   &__table {
     display: flex;
@@ -122,7 +122,6 @@ export default {
     padding-bottom: 15px;
 
     th {
-      max-width: 264px;
       width: 100%;
       text-align: start;
     }
@@ -136,7 +135,6 @@ export default {
     align-items: center;
 
     td {
-      max-width: 264px;
       width: 100%;
       text-align: start;
     }
