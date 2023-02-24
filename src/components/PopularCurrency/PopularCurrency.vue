@@ -19,17 +19,16 @@
       <div v-for="currency in currencyList" class="currency-item">
         <div class="currency__header">
           <div class="currency__logo">
-            <img :alt="currency.name" :src="currency.img" class="currency__img" />
-            <p class="currency__full-name">{{ currency.fullName }}</p>
+            <img :alt="currency.name" :src="`https://coinicons-api.vercel.app/api/icon/${currency.symbol.toLowerCase()}`" class="currency__img" />
           </div>
           <p class="currency__name">{{ currency.name }}</p>
         </div>
-        <div class="currency__last-price">$ {{ currency.lastPrice }}</div>
+        <div class="currency__last-price">$ {{ currency.price }}</div>
         <div :class="{
-            'currency-percentage_up': currency.percent >= 0
-          }" class="currency-percentage">{{ currency.percent }}%
+            'currency-percentage_up': currency.change >= 0
+          }" class="currency-percentage">{{ currency.change }}%
         </div>
-        <div class="currency-capitalization">$ {{ currency.capitalize }}</div>
+        <div class="currency-capitalization">$ {{ currency.marketCap }}</div>
       </div>
     </div>
   </section>
@@ -40,70 +39,28 @@ export default {
   name: "PopularCurrency",
   data() {
     return {
-      currencyList: [
-        {
-          id: 1,
-          img: "https://coinicons-api.vercel.app/api/icon/btc",
-          fullName: "Bitcoin",
-          name: "btc",
-          lastPrice: 0,
-          percent: 0,
-          capitalize: ""
-        },
-        {
-          id: 2,
-          img: "https://coinicons-api.vercel.app/api/icon/bnb",
-          fullName: "BNB",
-          name: "bnb",
-          lastPrice: 0,
-          percent: 0,
-          capitalize: ""
-        },
-        {
-          id: 3,
-          img: "https://coinicons-api.vercel.app/api/icon/busd",
-          fullName: "BUSD",
-          name: "busd",
-          lastPrice: 0,
-          percent: 0,
-          capitalize: ""
-        },
-        {
-          id: 4,
-          img: "https://coinicons-api.vercel.app/api/icon/eth",
-          fullName: "Ethereum",
-          name: "eth",
-          lastPrice: 0,
-          percent: 0,
-          capitalize: ""
-        }
-      ],
-      sockets: []
+      currencyList: [],
     };
   },
   created() {
-    this.currencyList.forEach(async (currency) => {
-      const socket = new WebSocket(
-        `wss://stream.binance.com:9443/ws/${currency.name.toLowerCase()}usdt@ticker`
-      );
+    const ws = new WebSocket('wss://stream.binance.com:9443/ws/!ticker@arr')
 
-      this.sockets.push(socket);
+    ws.onmessage = event => {
+      const data = JSON.parse(event.data)
+      const topCurrencies = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'BUSDUSDT', 'XRPUSDT']
+      const filteredData = data.filter(currency => topCurrencies.includes(currency.s))
 
-      socket.addEventListener("message", async function(event) {
-        const data = JSON.parse(event.data);
-        if (data.e === "24hrTicker") {
-          currency.percent = parseFloat(data.P).toPrecision(2);
-          currency.lastPrice = parseFloat(data.c).toFixed(0);
-          currency.capitalize = parseFloat(data.w * data.L / 1.405).toString().slice(0, 6) + "M";
+      this.currencyList = filteredData.map(currency => {
+        return {
+          name: currency.s.replace('USDT', ''),
+          price: parseFloat(currency.c).toFixed(2),
+          change: parseFloat(currency.P).toFixed(2),
+          marketCap: parseFloat(currency.q).toLocaleString(),
+          symbol: currency.s.slice(0, -4)
         }
-      });
-    });
+      })
+    }
   },
-  unmounted() {
-    this.sockets.forEach((socket) => {
-      socket.close();
-    })
-  }
 };
 </script>
 
@@ -186,10 +143,11 @@ export default {
 
   &__header {
     display: flex;
-    max-width: 200px;
-    justify-content: space-between;
+    max-width: 302px;
+    justify-content: start;
     gap: 10px;
     align-items: center;
+    padding-left: 40px;
   }
 
   &-percentage {
