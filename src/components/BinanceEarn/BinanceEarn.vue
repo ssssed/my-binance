@@ -29,39 +29,63 @@ export default {
       cards: [
         {
           name: 'usdt',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
+          link: 'https://coinicons-api.vercel.app/api/icon/usdt',
           percentMin: 0.6,
-          percentMax: 120.8
+          percentMax: 115.84
         },
         {
           name: 'btc',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
-          percentMin: -1.8,
-          percentMax: 73.9
+          link: 'https://coinicons-api.vercel.app/api/icon/btc',
+          percentMin: 0.74,
+          percentMax: 78.54
+        },
+        {
+          name: 'bnb',
+          link: 'https://coinicons-api.vercel.app/api/icon/bnb',
+          percentMin: 0.76,
+          percentMax: 70.20
+        },
+        {
+          name: 'busd',
+          link: 'https://coinicons-api.vercel.app/api/icon/busd',
+          percentMin: 0.60,
+          percentMax: 110.09
         },
         {
           name: 'etherium',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
-          percentMin: 1.2,
-          percentMax: 80.3
+          link: 'https://coinicons-api.vercel.app/api/icon/eth',
+          percentMin: 0.97,
+          percentMax: 56.52
         },
         {
-          name: 'doge',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
+          name: 'dot',
+          link: 'https://coinicons-api.vercel.app/api/icon/dot',
           percentMin: 0.8,
-          percentMax: 200.65
+          percentMax: 65.19
         },
         {
-          name: 'aboba',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
-          percentMin: -2.6,
-          percentMax: 1
+          name: 'ada',
+          link: 'https://coinicons-api.vercel.app/api/icon/ada',
+          percentMin: 1.03,
+          percentMax: 84.69
         },
         {
-          name: 'aboba2',
-          link: 'https://w7.pngwing.com/pngs/581/504/png-transparent-tether-usdt-cryptocoins-icon.png',
-          percentMin: -8.2,
-          percentMax: 250
+          name: 'shib',
+          link: 'https://coinicons-api.vercel.app/api/icon/shib',
+          percentMin: 0.36,
+          percentMax: 1.73
+        },
+        {
+          name: 'sol',
+          link: 'https://coinicons-api.vercel.app/api/icon/sol',
+          percentMin: 1.44,
+          percentMax: 68.95
+        },
+        {
+          name: 'matic',
+          link: 'https://coinicons-api.vercel.app/api/icon/matic',
+          percentMin: 2.84,
+          percentMax: 103.41
         },
       ]
     }

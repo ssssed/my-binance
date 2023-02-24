@@ -27,7 +27,7 @@ export default {
     link: String,
     percentMin: Number,
     percentMax: Number,
-  }
+  },
 };
 </script>
 
@@ -49,7 +49,6 @@ export default {
     background-color: #ffffff;
     transition: all 0.3s linear;
     border-color: rgb(252, 213, 53);
-
 
   //  сделать кнопку такого же цвета как и бордер
   }

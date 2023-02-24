@@ -1,5 +1,5 @@
 <template>
-  <main class="home">
+  <main class="page home">
     <div class="home__content">
       <popular-currency />
       <binance-earn />
@@ -24,6 +24,7 @@ export default {
 .home {
   background-color: #ffffff;
   font-family: Arial, serif;
+  min-height: calc(100vh - 70px - 85px);
 
   &__content {
     max-width: 1280px;
