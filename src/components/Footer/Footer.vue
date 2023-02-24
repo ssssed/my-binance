@@ -17,7 +17,7 @@ export default {
 
 <style lang="scss" scoped>
 .footer {
-  position: absolute;
+  display: block;
   bottom: 0;
   padding: 32px 0;
   max-width: 1280px;

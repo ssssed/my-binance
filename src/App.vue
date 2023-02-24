@@ -17,6 +17,10 @@ body {
   position: relative;
 }
 
+.page {
+  min-height: calc(100vh - 70px - 85px);
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
