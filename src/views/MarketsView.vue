@@ -35,7 +35,8 @@ export default {
     return {
       cryptocurrencies: [],
       currentPage: 0,
-      pageSize: 40
+      pageSize: 40,
+      firstRender: false,
     };
   },
   mounted() {
@@ -44,12 +45,25 @@ export default {
 
     websocket.onmessage = (event) => {
       const tickers = JSON.parse(event.data);
-      this.cryptocurrencies = tickers.map((ticker) => ({
-        name: ticker.s,
-        price: parseFloat(ticker.c).toFixed(2),
-        change: parseFloat(ticker.P).toFixed(2),
-        marketCap: parseFloat(ticker.q).toFixed(2)
-      }));
+      if(!this.firstRender) {
+        this.cryptocurrencies = tickers.map((ticker) => ({
+          name: ticker.s,
+          price: parseFloat(ticker.c).toFixed(2),
+          change: parseFloat(ticker.P).toFixed(2),
+          marketCap: parseFloat(ticker.q).toFixed(2)
+        }));
+        this.firstRender = true;
+      }
+      tickers.forEach((ticker) => {
+        const findTicker = this.cryptocurrencies.find((el) => el.name === ticker.s);
+        const updateTicker = {
+          name: ticker.s,
+          price: parseFloat(ticker.c).toFixed(2),
+          change: parseFloat(ticker.P).toFixed(2),
+          marketCap: parseFloat(ticker.q).toFixed(2)
+        };
+        for (const key in findTicker) findTicker[key] = updateTicker[key];
+      });
       this.sortByMarketCap();
     };
   },
