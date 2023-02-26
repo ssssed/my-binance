@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 49 48" fill="none" class="css-qn9zig">
+    <g clip-path="url(#twt-icon-primary_svg__clip0_1383_15360)">
+        <path d="M24.592 48c13.05 0 23.63-10.745 23.63-24S37.642 0 24.592 0C11.54 0 .96 10.745.96 24s10.58 24 23.63 24z"
+              fill="#1E6BBC"></path>
+        <path d="M24.759 10.5c4.67 3.961 10.025 3.717 11.555 3.717-.335 22.528-2.885 18.061-11.555 24.378-8.671-6.317-11.206-1.85-11.54-24.378 1.514 0 6.87.244 11.54-3.717z"
+              stroke="#fff" stroke-width="4" stroke-miterlimit="10" stroke-linecap="round"
+              stroke-linejoin="round"></path>
+    </g>
+    <defs>
+        <clipPath id="twt-icon-primary_svg__clip0_1383_15360">
+            <path fill="#fff" transform="translate(.666)" d="M0 0h48v48H0z"></path>
+        </clipPath>
+    </defs>
+</svg>
