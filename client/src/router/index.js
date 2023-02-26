@@ -23,7 +23,7 @@ const routes = [
     path: "/convert",
     name: "convert",
     component: () =>
-      import(/* webpackChunkName: "about" */ "../views/AboutView.vue")
+      import(/* webpackChunkName: "about" */ "../views/ConvertView.vue")
   },
   {
     path: "/profile",
@@ -36,6 +36,12 @@ const routes = [
     name: "admin",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/AdminView.vue")
+  },
+  {
+    path: "/test",
+    name: "test",
+    component: () =>
+      import(/* webpackChunkName: "about" */ "../views/TestView.vue")
   }
 ];
 
