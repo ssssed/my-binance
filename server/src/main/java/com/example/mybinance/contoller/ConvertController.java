@@ -18,13 +18,13 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/convert")
+@CrossOrigin(origins = "*")
 public class ConvertController {
 
     @Autowired
     private ConvertService convertService;
 
 
-    @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping
     public ResponseEntity convert(@RequestBody ConvertRequest body) throws ApiError {
         try {

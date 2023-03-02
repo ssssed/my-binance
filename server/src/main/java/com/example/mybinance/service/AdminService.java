@@ -24,9 +24,7 @@ public class AdminService {
                         rs.getInt("id"),
                         rs.getString("username"),
                         rs.getString("password"),
-                        rs.getString("avatar"),
-                        rs.getString("createdAt"),
-                        rs.getString("updatedAt")
+                        rs.getString("avatar")
                 ), username, password
         ).get(0);
     }
