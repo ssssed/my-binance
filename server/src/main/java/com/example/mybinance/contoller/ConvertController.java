@@ -1,10 +1,14 @@
 package com.example.mybinance.contoller;
 
+import com.example.mybinance.entity.ConvertEntity;
 import com.example.mybinance.entity.ConvertRequest;
+import com.example.mybinance.error.ApiError;
+import com.example.mybinance.service.ConvertService;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,30 +19,19 @@ import java.util.Map;
 @RestController
 @RequestMapping("/convert")
 public class ConvertController {
+
+    @Autowired
+    private ConvertService convertService;
+
+
     @CrossOrigin(origins = "http://localhost:8080")
     @PostMapping
-    public ResponseEntity convert(@RequestBody ConvertRequest body) throws IOException {
-        OkHttpClient client = new OkHttpClient().newBuilder().build();
-        Request request = new Request.Builder()
-                .url("https://api.binance.com/api/v3/ticker/price?symbol="+ body.getFrom() + body.getTo())
-                .method("GET", null)
-                .build();
+    public ResponseEntity convert(@RequestBody ConvertRequest body) throws ApiError {
         try {
-            Response response = client.newCall(request).execute();
-            String responseBody = response.body().string();
-            JSONObject jsonObject = new JSONObject(responseBody);
-            double price = jsonObject.getDouble("price");
-            final Map<String,Double> result = new HashMap<>();
-            result.put("price", price);
-            return ResponseEntity.status(200).body(result);
-        }
-        catch (IOException err) {
-            Map<String, String> error = new HashMap<>();
-            error.put("message", err.toString());
-            return ResponseEntity.status(400).body(error);
-        }
-        catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            ConvertEntity answer = convertService.convert(body.getFrom(), body.getTo());
+            return ResponseEntity.ok(answer);
+        } catch (ApiError error) {
+            return ResponseEntity.badRequest().body(error);
         }
     }
 }

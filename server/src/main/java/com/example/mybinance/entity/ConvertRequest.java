@@ -4,6 +4,11 @@ public class ConvertRequest {
     private String to;
     private String from;
 
+    public ConvertRequest(String from, String to) {
+        this.from = from;
+        this.to = to;
+    }
+
     public String getTo() {
         return to;
     }

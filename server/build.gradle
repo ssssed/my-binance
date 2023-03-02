@@ -18,6 +18,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'com.squareup.okhttp3:okhttp:4.9.2'
 	implementation 'org.json:json:20210307'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
+	implementation 'org.postgresql:postgresql:42.2.18'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
