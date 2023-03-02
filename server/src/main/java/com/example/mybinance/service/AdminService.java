@@ -1,7 +1,6 @@
 package com.example.mybinance.service;
 
 import com.example.mybinance.entity.UserEntity;
-import com.example.mybinance.entity.UserRequest;
 import com.example.mybinance.error.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -13,7 +12,7 @@ public class AdminService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    private boolean isUserCreated(String username) {
+    public boolean isUserCreated(String username) {
         String sql = "SELECT COUNT(*) FROM admins WHERE username = ?";
         return jdbcTemplate.queryForObject(sql, Integer.class, username) != 0;
     }
@@ -38,6 +37,16 @@ public class AdminService {
             return getUser(username, password);
         } else
             throw new ApiError("Неправильный логин или пароль");
+    }
 
+    public void create(String name, String password, String authHeader) throws ApiError {
+        if (authHeader.equals(name + ":" + password)) {
+            throw new ApiError("У вас нет прав администратора!");
+        }
+        if (isUserCreated(name)) {
+            throw new ApiError("Администратор с таким именем существует");
+        }
+        String sql = "INSERT INTO admins(username, password, avatar) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, name, password, null);
     }
 }
