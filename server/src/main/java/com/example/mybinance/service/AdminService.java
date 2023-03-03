@@ -1,10 +1,13 @@
 package com.example.mybinance.service;
 
+import com.example.mybinance.entity.TransactionEntity;
 import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.error.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class AdminService {
@@ -46,5 +49,39 @@ public class AdminService {
         }
         String sql = "INSERT INTO admins(username, password, avatar) VALUES (?, ?, ?)";
         jdbcTemplate.update(sql, name, password, null);
+    }
+
+    public List<UserEntity> getUsers(String auth) throws ApiError {
+        List<String> adminData = List.of(auth.split(":"));
+        UserEntity admin = getUser(adminData.get(0), adminData.get(1));
+        if (admin != null) {
+            String selectAll = "SELECT * FROM users";
+            return jdbcTemplate.query(selectAll, (rs, rowNum) -> new UserEntity(
+                    rs.getInt("id"),
+                    rs.getString("username"),
+                    rs.getString("password"),
+                    rs.getString("avatar"))
+            );
+        }
+        throw new ApiError("у вас недостаточно прав!");
+    }
+
+    public List<TransactionEntity> getTransfers(String auth) throws ApiError {
+        List<String> adminData = List.of(auth.split(":"));
+        UserEntity admin = getUser(adminData.get(0), adminData.get(1));
+        if (admin != null) {
+            String selectAll = "SELECT * FROM transactions";
+            return jdbcTemplate.query(selectAll, (rs, rowNum) -> new TransactionEntity(
+                    rs.getLong("id"),
+                    rs.getDouble("amount"),
+                    rs.getDouble("price"),
+                    rs.getString("type"),
+                    rs.getTimestamp("createdAt"),
+                    rs.getTimestamp("updatedAt"),
+                    rs.getLong("walletId"),
+                    rs.getLong("currencyId")
+            ));
+        }
+        throw new ApiError("у вас недостаточно прав!");
     }
 }

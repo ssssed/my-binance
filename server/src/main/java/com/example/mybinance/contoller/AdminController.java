@@ -33,4 +33,22 @@ public class AdminController {
             return ResponseEntity.badRequest().body(err.toString());
         }
     }
+
+    @GetMapping("/users")
+    public ResponseEntity getUsersList(@RequestHeader("Authorization") String authHeader) {
+        try {
+            return ResponseEntity.ok(adminService.getUsers(authHeader));
+        } catch (ApiError e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
+
+    @GetMapping("/transactions")
+    public ResponseEntity getTransactions(@RequestHeader("Authorization") String authHeader) {
+        try {
+            return ResponseEntity.ok(adminService.getTransfers(authHeader));
+        } catch (ApiError e) {
+            return ResponseEntity.badRequest().body(e);
+        }
+    }
 }
