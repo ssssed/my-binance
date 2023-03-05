@@ -4,19 +4,15 @@
     <div class="form">
       <div class="form__group">
         <label>Исходная валюта</label>
-        <select v-model="fromCurrency" @change="getExchangeRate">
-          <option v-for="currency in currencies" :value="currency">{{ currency }}</option>
-        </select>
+        <custom-select v-model="fromCurrency" :selected="fromCurrency" :options="currencies"  @update-selected="selectFromCurrency"/>
       </div>
       <div class="form__group">
         <label>Количество</label>
-        <input type="number" v-model="amount" @input="getExchangeRate">
+        <input placeholder="Кол-во монет" type="number" v-model="amount" @input="getExchangeRate">
       </div>
       <div class="form__group">
         <label>Целевая валюта</label>
-        <select v-model="toCurrency" @change="getExchangeRate">
-          <option v-for="currency in currencies" :value="currency">{{ currency }}</option>
-        </select>
+        <custom-select v-model="toCurrency" :selected="toCurrency" :options="fromCurrencies"  @update-selected="selectToCurrency"/>
       </div>
     </div>
     <div class="result">
@@ -27,14 +23,17 @@
   </div>
 </template>
 <script>
-import { axiosService } from "@/api";
+import {axiosService} from "@/api";
+import CustomSelect from "@/components/CustomSelect/CustomSelect.vue";
 
 export default {
+  components: {CustomSelect},
   data() {
     return {
-      currencies: ['BTC', 'ETH', 'LTC', 'XRP', 'USDT'], // список поддерживаемых валют
+      currencies: ['BTC', 'ETH', 'LTC', 'XRP'], // список поддерживаемых валют
+      fromCurrencies: ['USDT'],
       fromCurrency: 'BTC', // исходная валюта
-      toCurrency: 'ETH', // целевая валюта
+      toCurrency: 'USDT', // целевая валюта
       amount: 1, // количество исходной валюты
       exchangeRate: null, // курс обмена
       convertedAmount: null // количество целевой валюты
@@ -45,15 +44,20 @@ export default {
   },
   methods: {
     async getExchangeRate() {
-      // const response = await axiosService.post('/convert', {
-      //   from: this.fromCurrency,
-      //   to: this.toCurrency
-      // });
-      // console.log(response);
-      // if(response.status === 200) {
-      //   this.exchangeRate = response.data;
-      //   this.convertedAmount = (this.amount * this.exchangeRate).toFixed(8)
-      // }
+      const response = await axiosService.post('/convert', {
+        from: this.fromCurrency,
+        to: this.toCurrency
+      });
+      if (response.status === 200) {
+        this.exchangeRate = response.data.price;
+        this.convertedAmount = (this.amount * this.exchangeRate).toFixed(8)
+      }
+    },
+    selectFromCurrency(currency) {
+      this.fromCurrency = currency;
+    },
+    selectToCurrency(currency) {
+      this.toCurrency = currency;
     }
   }
 }
@@ -63,12 +67,41 @@ export default {
   max-width: 1280px;
   width: 100%;
   margin: 0 auto;
+  padding-top: 40px;
 }
+
 .form {
   display: flex;
   flex-direction: column;
   align-items: center;
   padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 60px auto 0;
+}
+
+.form__group {
+  display: flex;
+  align-items: center;
+  padding: 10px 20px;
+  max-width: 384px;
+  width: 100%;
+  justify-content: space-between;
+
+
+  & input[type=number] {
+    -moz-appearance: textfield; /* убрать стрелки в Firefox */
+    appearance: textfield; /* убрать стрелки в других браузерах */
+    border: 1px solid #ccc; /* убрать рамку */
+    outline: none; /* убрать контур вокруг элемента */
+    background-color: white; /* убрать фоновый цвет */
+    text-align: center; /* выравнивание текста по центру */
+    max-width: 140px;
+    border-radius: 18px;
+    padding: 12px 20px;
+    width: 100%; /* установить ширину элемента на 100% */
+  }
 }
 
 .form-input {
@@ -109,5 +142,15 @@ export default {
   margin-top: 20px;
   font-size: 24px;
   font-weight: bold;
+}
+
+.result {
+  padding-top: 25px;
+  max-width: 400px;
+  margin: 0 auto;
+
+  & h2, p {
+    text-align: center;
+  }
 }
 </style>

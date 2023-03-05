@@ -14,7 +14,7 @@
           </span>
     </p>
     <button class="card__button">
-      <img alt="next" class="card__next-btn" src="@/assets/next.svg" />
+      <img alt="next" class="card__next-btn" src="@/assets/accordion.svg" />
     </button>
   </div>
 </template>

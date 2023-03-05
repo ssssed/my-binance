@@ -13,7 +13,7 @@
       <tbody class="market__body">
       <tr v-for="(cryptocurrency, index) in displayedCryptocurrencies" :key="index" class="currency">
         <td>
-          {{ cryptocurrency.name }}
+          {{ cryptocurrency.name.replace("USDT", "") }}
         </td>
         <td>{{ cryptocurrency.price }} $</td>
         <td :class="{ 'green': cryptocurrency.change > 0, 'red': cryptocurrency.change < 0 }">{{ cryptocurrency.change
@@ -24,8 +24,23 @@
       </tbody>
     </table>
     <div class="pagination">
-      <button class="pagination__button" :disabled="currentPage === 0" @click="prevPage">Предыдущая</button>
-      <button class="pagination__button" :disabled="currentPage === totalPages - 1" @click="nextPage">Следующая</button>
+      <button
+          :class="{
+                'pagination__button_disable': currentPage === 0,
+          }"
+          :disabled="currentPage === 0"
+          class="pagination__button"
+          @click="prevPage"
+      >Предыдущая
+      </button>
+      <button :class="{
+                'pagination__button_disable': currentPage === totalPages - 1,
+              }"
+              :disabled="currentPage === totalPages - 1"
+              class="pagination__button"
+              @click="nextPage"
+      >Следующая
+      </button>
     </div>
   </div>
 </template>
@@ -52,17 +67,20 @@ export default {
           change: parseFloat(ticker.P).toFixed(2),
           marketCap: parseFloat(ticker.q).toFixed(2)
         }));
+        this.cryptocurrencies = this.cryptocurrencies.filter((el) => el.name.slice(el.name.length - 4,) === "USDT");
         this.firstRender = true;
       }
       tickers.forEach((ticker) => {
         const findTicker = this.cryptocurrencies.find((el) => el.name === ticker.s);
-        const updateTicker = {
-          name: ticker.s,
-          price: parseFloat(ticker.c).toFixed(2),
-          change: parseFloat(ticker.P).toFixed(2),
-          marketCap: parseFloat(ticker.q).toFixed(2)
-        };
-        for (const key in findTicker) findTicker[key] = updateTicker[key];
+        if (findTicker) {
+          const updateTicker = {
+            name: ticker.s,
+            price: parseFloat(ticker.c).toFixed(2),
+            change: parseFloat(ticker.P).toFixed(2),
+            marketCap: parseFloat(ticker.q).toFixed(2)
+          };
+          for (const key in findTicker) findTicker[key] = updateTicker[key];
+        }
       });
       this.sortByMarketCap();
     };
@@ -114,6 +132,10 @@ export default {
     line-height: 24px;
     cursor: pointer;
     border: 0;
+
+    &_disable {
+      color: #b9c0c9;
+    }
   }
 }
 

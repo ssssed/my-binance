@@ -3,6 +3,7 @@
    <router-link to="/"><img alt="logo" class="header__logo" src="@/assets/logo.svg" /></router-link>
     <nav class="header__nav">
       <router-link active-class="header__link_active" class="header__link" to="/">Главная</router-link>
+      <router-link active-class="header__link_active" class="header__link" to="/about">О нас</router-link>
       <router-link active-class="header__link_active" class="header__link" to="/markets">Рынок</router-link>
       <router-link active-class="header__link_active" class="header__link" to="/convert">Торговля</router-link>
       <router-link active-class="header__link_active" class="header__link" to="/profile">Личный кабинет</router-link>
