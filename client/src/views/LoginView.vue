@@ -1,47 +1,47 @@
 <template>
     <div class="page conteiner">
-        <form class="form"><h2 class="container__title">Создание личного аккаунта</h2>
+        <form class="form" @submit.prevent="handleSubmit">
+            <h2 class="container__title">Вход в аккаунт</h2>
             <div class="form__input-container">
                 <label class="lable">Адрес личной эл.почты</label>
                 <input v-model.t.trim="login" :class="{
                 'input_error': loginError.isError
                 }" @focus="loginFocus = true" type="email"
-                       class="input" required minlength="5"/>
+                       class="input"/>
                 <span class="error">{{ loginError.text }}</span>
             </div>
             <div class="form__input-container">
                 <label class="lable">Пароль</label>
                 <input v-model.t.trim="password" @focus="passwordFocus = true" :class="{
                 'input_error': passwordError.isError
-                }" type="password" class="input" required minlength="1"/>
+                }" type="password" class="input"/>
                 <span class="error">{{ passwordError.text }}</span>
-            </div>
-            <div class="form__agree">
-                <input v-model="isAgree" type="checkbox"
-                       value="Я согласен получать маркетинговые материалы от Binance."/>
-                <p class="text">Я согласен получать маркетинговые материалы от My Binance.</p>
             </div>
             <button type="submit" class="button" :disabled="buttonDisabled" :class="{
             'button_disable': buttonDisabled
-            }">Создание личного аккаунта
+            }">Войти
             </button>
             <div class="need-account">
-                Уже есть аккаунт?
-                <router-link class="need-account__link" to="/login">Войти</router-link>
+                Нет аккаунта?
+                <router-link class="need-account__link" to="/register">Зарегистрироваться</router-link>
             </div>
         </form>
     </div>
 </template>
 <script>
 export default {
-    name: "RegisterView",
+    name: "LoginView",
     data() {
         return {
             login: '',
             loginFocus: false,
             passwordFocus: false,
             password: '',
-            isAgree: false,
+        }
+    },
+    methods: {
+        handleSubmit() {
+            console.log(this.login, this.password);
         }
     },
     computed: {
@@ -49,8 +49,10 @@ export default {
             const login = this.login.trim();
             if (this.loginFocus) {
                 if (!login) return {text: "Поле обязательно к заполнению", isError: true}
-                if (login.length < 5) return {text: "Минимальная длинна 5 символов", isError: true}
-                if (!login.includes("@")) return {text: "Это поле должно быть почтой", isError: true}
+                if (!login.includes("@") || login.at(-1) === '@') return {
+                    text: "Это поле должно быть почтой",
+                    isError: true
+                }
                 return {text: "", isError: false}
             }
             return {text: "", isError: false}
@@ -95,18 +97,6 @@ export default {
   width: 100%;
   margin: 0 auto;
   gap: 24px;
-
-  &__agree {
-    display: flex;
-    align-items: start;
-    gap: 10px;
-
-    p {
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 20px;
-    }
-  }
 
   &__input-container {
     display: flex;
