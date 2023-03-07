@@ -1,65 +1,68 @@
 <template>
-  <div class="page convert">
-    <h1>Конвертер криптовалют</h1>
-    <div class="form">
-      <div class="form__group">
-        <label>Исходная валюта</label>
-        <custom-select v-model="fromCurrency" :selected="fromCurrency" :options="currencies"  @update-selected="selectFromCurrency"/>
-      </div>
-      <div class="form__group">
-        <label>Количество</label>
-        <input placeholder="Кол-во монет" type="number" v-model="amount" @input="getExchangeRate">
-      </div>
-      <div class="form__group">
-        <label>Целевая валюта</label>
-        <custom-select v-model="toCurrency" :selected="toCurrency" :options="fromCurrencies"  @update-selected="selectToCurrency"/>
-      </div>
+    <div class="page convert">
+        <h1>Конвертер криптовалют</h1>
+        <div class="form">
+            <div class="form__group">
+                <label>Исходная валюта</label>
+                <custom-select v-model="fromCurrency" :selected="fromCurrency" :options="currencies"
+                               @update-selected="selectFromCurrency"/>
+            </div>
+            <div class="form__group">
+                <label>Количество</label>
+                <input placeholder="Кол-во монет" type="number" v-model="amount" @input="getExchangeRate">
+            </div>
+            <div class="form__group">
+                <label>Целевая валюта</label>
+                <custom-select v-model="toCurrency" :selected="toCurrency" :options="fromCurrencies"
+                               @update-selected="selectToCurrency"/>
+            </div>
+        </div>
+        <div class="result">
+            <h2>Результат:</h2>
+            <p>{{ amount }} {{ fromCurrency }} = {{ convertedAmount }} {{ toCurrency }}</p>
+            <p>Курс обмена: 1 {{ fromCurrency }} = {{ exchangeRate }} {{ toCurrency }}</p>
+        </div>
     </div>
-    <div class="result">
-      <h2>Результат:</h2>
-      <p>{{ amount }} {{ fromCurrency }} = {{ convertedAmount }} {{ toCurrency }}</p>
-      <p>Курс обмена: 1 {{ fromCurrency }} = {{ exchangeRate }} {{ toCurrency }}</p>
-    </div>
-  </div>
 </template>
 <script>
 import {axiosService} from "@/api";
 import CustomSelect from "@/components/CustomSelect/CustomSelect.vue";
 
 export default {
-  components: {CustomSelect},
-  data() {
-    return {
-      currencies: ['BTC', 'ETH', 'LTC', 'XRP'], // список поддерживаемых валют
-      fromCurrencies: ['USDT'],
-      fromCurrency: 'BTC', // исходная валюта
-      toCurrency: 'USDT', // целевая валюта
-      amount: 1, // количество исходной валюты
-      exchangeRate: null, // курс обмена
-      convertedAmount: null // количество целевой валюты
-    }
-  },
-  mounted() {
-    this.getExchangeRate()
-  },
-  methods: {
-    async getExchangeRate() {
-      const response = await axiosService.post('/convert', {
-        from: this.fromCurrency,
-        to: this.toCurrency
-      });
-      if (response.status === 200) {
-        this.exchangeRate = response.data.price;
-        this.convertedAmount = (this.amount * this.exchangeRate).toFixed(8)
-      }
+    components: {CustomSelect},
+    data() {
+        return {
+            currencies: ['BTC', 'ETH', 'LTC', 'XRP'], // список поддерживаемых валют
+            fromCurrencies: ['USDT'],
+            fromCurrency: 'BTC', // исходная валюта
+            toCurrency: 'USDT', // целевая валюта
+            amount: 1, // количество исходной валюты
+            exchangeRate: null, // курс обмена
+            convertedAmount: null // количество целевой валюты
+        }
     },
-    selectFromCurrency(currency) {
-      this.fromCurrency = currency;
+    mounted() {
+        this.getExchangeRate()
     },
-    selectToCurrency(currency) {
-      this.toCurrency = currency;
+    methods: {
+        async getExchangeRate() {
+            const response = await axiosService.post('/convert', {
+                from: this.fromCurrency,
+                to: this.toCurrency
+            });
+            if (response.status === 200) {
+                this.exchangeRate = response.data.price;
+                this.convertedAmount = (this.amount * this.exchangeRate).toFixed(8)
+            }
+
+        },
+        selectFromCurrency(currency) {
+            this.fromCurrency = currency;
+        },
+        selectToCurrency(currency) {
+            this.toCurrency = currency;
+        }
     }
-  }
 }
 </script>
 <style lang="scss" scoped>

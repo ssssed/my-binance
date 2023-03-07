@@ -1,64 +1,66 @@
 <template>
-  <div class="custom-select">
-    <div class="selected-option" @click="toggleOptions">
+    <div class="custom-select">
+        <div class="selected-option" @click="toggleOptions">
       <span class="custom-select__option" :class="{
         'custom-select__option_open': isOpen
-      }"><img class="custom-select__img" :alt="selectedOption" :src="`https://coinicons-api.vercel.app/api/icon/${selectedOption.toLowerCase()}`" />{{ selectedOption }}
+      }"><img class="custom-select__img" :alt="selectedOption"
+              :src="`https://coinicons-api.vercel.app/api/icon/${selectedOption.toLowerCase()}`"/>{{ selectedOption }}
       </span>
-      <i :class="`fas fa-chevron-${isOpen ? 'up' : 'down'}`"></i>
-    </div>
-    <transition name="fade">
-      <div class="options" v-if="isOpen">
-        <div
-            class="option"
-            v-for="(option, index) in filteredOptions"
-            :key="index"
-            @click="selectOption(index)"
-        >
+            <i :class="`fas fa-chevron-${isOpen ? 'up' : 'down'}`"></i>
+        </div>
+        <transition name="fade">
+            <div class="options" v-if="isOpen">
+                <div
+                        class="option"
+                        v-for="(option, index) in filteredOptions"
+                        :key="index"
+                        @click="selectOption(option)"
+                >
           <span class="option__content">
-            <img class="custom-select__img" :alt="selectedOption" :src="`https://coinicons-api.vercel.app/api/icon/${option.toLowerCase()}`" />
+            <img class="custom-select__img" :alt="selectedOption"
+                 :src="`https://coinicons-api.vercel.app/api/icon/${option.toLowerCase()}`"/>
             {{ option }}
           </span>
-        </div>
-      </div>
-    </transition>
-  </div>
+                </div>
+            </div>
+        </transition>
+    </div>
 </template>
 
 <script>
 export default {
-  props: {
-    options: {
-      type: Array,
-      required: true,
+    props: {
+        options: {
+            type: Array,
+            required: true,
+        },
+        selected: {
+            type: String,
+            required: true,
+        },
     },
-    selected: {
-      type: String,
-      required: true,
+    data() {
+        return {
+            isOpen: false,
+        };
     },
-  },
-  data() {
-    return {
-      isOpen: false,
-    };
-  },
-  computed: {
-    selectedOption() {
-      return this.selected || this.options[0];
+    computed: {
+        selectedOption() {
+            return this.selected || this.options[0];
+        },
+        filteredOptions() {
+            return this.options.filter((el) => el !== this.selected)
+        }
     },
-    filteredOptions() {
-      return this.options.filter((el) => el !== this.selected)
-    }
-  },
-  methods: {
-    toggleOptions() {
-      this.isOpen = !this.isOpen;
+    methods: {
+        toggleOptions() {
+            this.isOpen = !this.isOpen;
+        },
+        selectOption(option) {
+            this.$emit("update-selected", this.options.find((el) => el === option));
+            this.isOpen = false;
+        },
     },
-    selectOption(index) {
-      this.$emit("update-selected", this.options[index]);
-      this.isOpen = false;
-    },
-  },
 };
 </script>
 
