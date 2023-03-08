@@ -1,5 +1,7 @@
 package com.example.mybinance.contoller;
 
+import com.example.mybinance.entity.AddCurrencyRequest;
+import com.example.mybinance.entity.UserData;
 import com.example.mybinance.entity.UserRequest;
 import com.example.mybinance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,10 +29,10 @@ public class UserController {
     public ResponseEntity register(@RequestBody UserRequest user) {
 
         try {
-            userService.register(user.getUsername(), user.getPassword());
-            return ResponseEntity.ok("Пользователь создан");
+//            userService.register(user.getUsername(), user.getPassword());
+            return ResponseEntity.ok(userService.registerUser(user.getUsername(), user.getPassword(), null, user.getUsername() + "Wallet"));
         } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e);
+            return ResponseEntity.badRequest().body("Пользователь не был создан");
         }
     }
 }
