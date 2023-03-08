@@ -71,7 +71,7 @@ export default {
         if (response.status === 200) {
           this.changeAuthStatus(true);
           this.changeUserInfo(response.data);
-          sessionStorage.setItem("userInfo", JSON.stringify(response.data));
+          localStorage.setItem("userInfo", JSON.stringify(response.data));
           this.$router.push({ name: "home" });
         }
       } catch (e) {

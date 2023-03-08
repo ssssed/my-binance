@@ -30,4 +30,15 @@ body {
 </style>
 <script setup>
 import Header from "@/components/Header/Header.vue";
-import Footer from "@/components/Footer/Footer.vue";</script>
+import Footer from "@/components/Footer/Footer.vue";
+import { useStore } from "vuex";
+function setup() {
+  const store = useStore();
+  const mySessionData = JSON.parse(localStorage.getItem("userInfo"));
+
+  if (mySessionData) {
+    store.dispatch("changeAuthStatus", mySessionData);
+  }
+}
+setup();
+</script>
