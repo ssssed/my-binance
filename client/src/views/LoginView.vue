@@ -1,77 +1,116 @@
 <template>
-    <div class="page conteiner">
-        <form class="form" @submit.prevent="handleSubmit">
-            <h2 class="container__title">Вход в аккаунт</h2>
-            <div class="form__input-container">
-                <label class="lable">Адрес личной эл.почты</label>
-                <input v-model.t.trim="login" :class="{
-                'input_error': loginError.isError
-                }" @focus="loginFocus = true" type="email"
-                       class="input"/>
-                <span class="error">{{ loginError.text }}</span>
-            </div>
-            <div class="form__input-container">
-                <label class="lable">Пароль</label>
-                <input v-model.t.trim="password" @focus="passwordFocus = true" :class="{
-                'input_error': passwordError.isError
-                }" type="password" class="input"/>
-                <span class="error">{{ passwordError.text }}</span>
-            </div>
-            <button type="submit" class="button" :disabled="buttonDisabled" :class="{
-            'button_disable': buttonDisabled
-            }">Войти
-            </button>
-            <div class="need-account">
-                Нет аккаунта?
-                <router-link class="need-account__link" to="/register">Зарегистрироваться</router-link>
-            </div>
-        </form>
-    </div>
+  <div class="page conteiner">
+    <form class="form" @submit.prevent="handleSubmit">
+      <h2 class="container__title">Вход в аккаунт</h2>
+      <div class="form__input-container">
+        <label class="lable">Адрес личной эл.почты</label>
+        <input
+          v-model.trim="login"
+          :class="{
+            input_error: loginError.isError,
+          }"
+          @focus="loginFocus = true"
+          type="email"
+          class="input"
+        />
+        <span class="error">{{ loginError.text }}</span>
+      </div>
+      <div class="form__input-container">
+        <label class="lable">Пароль</label>
+        <input
+          v-model.trim="password"
+          @focus="passwordFocus = true"
+          :class="{
+            input_error: passwordError.isError,
+          }"
+          type="password"
+          class="input"
+        />
+        <span class="error">{{ passwordError.text }}</span>
+      </div>
+      <button
+        type="submit"
+        class="button"
+        :disabled="buttonDisabled"
+        :class="{
+          button_disable: buttonDisabled,
+        }"
+      >
+        Войти
+      </button>
+      <div class="need-account">
+        Нет аккаунта?
+        <router-link class="need-account__link" to="/register"
+          >Зарегистрироваться</router-link
+        >
+      </div>
+    </form>
+  </div>
 </template>
 <script>
+import { axiosService } from "@/api";
+import { mapActions } from "vuex";
 export default {
-    name: "LoginView",
-    data() {
-        return {
-            login: '',
-            loginFocus: false,
-            passwordFocus: false,
-            password: '',
+  name: "LoginView",
+  data() {
+    return {
+      login: "",
+      loginFocus: false,
+      passwordFocus: false,
+      password: "",
+    };
+  },
+  methods: {
+    ...mapActions(["changeAuthStatus", "changeUserInfo"]),
+    async handleSubmit() {
+      try {
+        const response = await axiosService.post("/user/auth", {
+          username: this.login,
+          password: this.password,
+        });
+        if (response.status === 200) {
+          this.changeAuthStatus(true);
+          this.changeUserInfo(response.data);
+          sessionStorage.setItem("userInfo", JSON.stringify(response.data));
+          this.$router.push({ name: "home" });
         }
+      } catch (e) {
+        this.changeUserInfo({});
+        this.changeAuthStatus(false);
+      }
     },
-    methods: {
-        handleSubmit() {
-            console.log(this.login, this.password);
-        }
+  },
+  computed: {
+    loginError() {
+      const login = this.login.trim();
+      if (this.loginFocus) {
+        if (!login)
+          return { text: "Поле обязательно к заполнению", isError: true };
+        if (!login.includes("@") || login.at(-1) === "@")
+          return {
+            text: "Это поле должно быть почтой",
+            isError: true,
+          };
+        return { text: "", isError: false };
+      }
+      return { text: "", isError: false };
     },
-    computed: {
-        loginError() {
-            const login = this.login.trim();
-            if (this.loginFocus) {
-                if (!login) return {text: "Поле обязательно к заполнению", isError: true}
-                if (!login.includes("@") || login.at(-1) === '@') return {
-                    text: "Это поле должно быть почтой",
-                    isError: true
-                }
-                return {text: "", isError: false}
-            }
-            return {text: "", isError: false}
-        },
-        passwordError() {
-            const password = this.password.trim();
-            if (this.passwordFocus) {
-                if (!password) return {text: "Поле обязательно к заполнению", isError: true}
-                return {text: "", isError: false}
-            }
-            return {text: "", isError: false}
-        },
-        buttonDisabled() {
-            if (this.loginError.isError && this.passwordError.isError) return true;
-            if (this.loginError.isError || this.passwordError.isError) return true;
-            else return false
-        }
-    }
-}
+    passwordError() {
+      const password = this.password.trim();
+      if (this.passwordFocus) {
+        if (!password)
+          return { text: "Поле обязательно к заполнению", isError: true };
+        return { text: "", isError: false };
+      }
+      return { text: "", isError: false };
+    },
+    buttonDisabled() {
+      if (this.loginError.isError && this.passwordError.isError) return true;
+      if (this.loginError.isError || this.passwordError.isError) return true;
+      else return false;
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .conteiner {
@@ -194,7 +233,6 @@ export default {
     cursor: pointer;
     display: inline;
     text-decoration: none;
-
 
     &:hover {
       color: rgb(252, 213, 53);

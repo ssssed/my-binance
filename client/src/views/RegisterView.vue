@@ -1,75 +1,121 @@
 <template>
-    <div class="page conteiner">
-        <form class="form"><h2 class="container__title">Создание личного аккаунта</h2>
-            <div class="form__input-container">
-                <label class="lable">Адрес личной эл.почты</label>
-                <input v-model.t.trim="login" :class="{
-                'input_error': loginError.isError
-                }" @focus="loginFocus = true" type="email"
-                       class="input" required minlength="5"/>
-                <span class="error">{{ loginError.text }}</span>
-            </div>
-            <div class="form__input-container">
-                <label class="lable">Пароль</label>
-                <input v-model.t.trim="password" @focus="passwordFocus = true" :class="{
-                'input_error': passwordError.isError
-                }" type="password" class="input" required minlength="1"/>
-                <span class="error">{{ passwordError.text }}</span>
-            </div>
-            <div class="form__agree">
-                <input v-model="isAgree" type="checkbox"
-                       value="Я согласен получать маркетинговые материалы от Binance."/>
-                <p class="text">Я согласен получать маркетинговые материалы от My Binance.</p>
-            </div>
-            <button type="submit" class="button" :disabled="buttonDisabled" :class="{
-            'button_disable': buttonDisabled
-            }">Создание личного аккаунта
-            </button>
-            <div class="need-account">
-                Уже есть аккаунт?
-                <router-link class="need-account__link" to="/login">Войти</router-link>
-            </div>
-        </form>
-    </div>
+  <div class="page conteiner">
+    <form class="form" @submit.prevent="handleSubmit">
+      <h2 class="container__title">Создание личного аккаунта</h2>
+      <div class="form__input-container">
+        <label class="lable">Адрес личной эл.почты</label>
+        <input
+          v-model.trim="login"
+          :class="{
+            input_error: loginError.isError,
+          }"
+          @focus="loginFocus = true"
+          type="email"
+          class="input"
+          required
+          minlength="5"
+        />
+        <span class="error">{{ loginError.text }}</span>
+      </div>
+      <div class="form__input-container">
+        <label class="lable">Пароль</label>
+        <input
+          v-model.trim="password"
+          @focus="passwordFocus = true"
+          :class="{
+            input_error: passwordError.isError,
+          }"
+          type="password"
+          class="input"
+          required
+          minlength="1"
+        />
+        <span class="error">{{ passwordError.text }}</span>
+      </div>
+      <div class="form__agree">
+        <input
+          v-model="isAgree"
+          type="checkbox"
+          value="Я согласен получать маркетинговые материалы от Binance."
+        />
+        <p class="text">
+          Я согласен получать маркетинговые материалы от My Binance.
+        </p>
+      </div>
+      <button
+        type="submit"
+        class="button"
+        :disabled="buttonDisabled"
+        :class="{
+          button_disable: buttonDisabled,
+        }"
+      >
+        Создание личного аккаунта
+      </button>
+      <div class="need-account">
+        Уже есть аккаунт?
+        <router-link class="need-account__link" to="/login">Войти</router-link>
+      </div>
+    </form>
+  </div>
 </template>
 <script>
+import { axiosService } from "@/api";
 export default {
-    name: "RegisterView",
-    data() {
-        return {
-            login: '',
-            loginFocus: false,
-            passwordFocus: false,
-            password: '',
-            isAgree: false,
+  name: "RegisterView",
+  data() {
+    return {
+      login: "",
+      loginFocus: false,
+      passwordFocus: false,
+      password: "",
+      isAgree: false,
+    };
+  },
+  methods: {
+    async handleSubmit() {
+      try {
+        const response = await axiosService.post("/user/create", {
+          username: this.login,
+          password: this.password,
+        });
+        if (response.status === 200) {
+          console.log(response.data);
+          this.$router.push({ name: "login" });
         }
+      } catch (err) {}
     },
-    computed: {
-        loginError() {
-            const login = this.login.trim();
-            if (this.loginFocus) {
-                if (!login) return {text: "Поле обязательно к заполнению", isError: true}
-                if (login.length < 5) return {text: "Минимальная длинна 5 символов", isError: true}
-                if (!login.includes("@")) return {text: "Это поле должно быть почтой", isError: true}
-                return {text: "", isError: false}
-            }
-            return {text: "", isError: false}
-        },
-        passwordError() {
-            const password = this.password.trim();
-            if (this.passwordFocus) {
-                if (!password) return {text: "Поле обязательно к заполнению", isError: true}
-                return {text: "", isError: false}
-            }
-            return {text: "", isError: false}
-        },
-        buttonDisabled() {
-            if (this.loginError.isError && this.passwordError.isError) return true;
-            if (this.loginError.isError || this.passwordError.isError) return true;
-            else return false
-        }
-    }
-}
+  },
+  computed: {
+    loginError() {
+      const login = this.login.trim();
+      if (this.loginFocus) {
+        if (!login)
+          return { text: "Поле обязательно к заполнению", isError: true };
+        if (login.length < 5)
+          return { text: "Минимальная длинна 5 символов", isError: true };
+        if (!login.includes("@"))
+          return { text: "Это поле должно быть почтой", isError: true };
+        return { text: "", isError: false };
+      }
+      return { text: "", isError: false };
+    },
+    passwordError() {
+      const password = this.password.trim();
+      if (this.passwordFocus) {
+        if (!password)
+          return { text: "Поле обязательно к заполнению", isError: true };
+        return { text: "", isError: false };
+      }
+      return { text: "", isError: false };
+    },
+    buttonDisabled() {
+      if (this.loginError.isError && this.passwordError.isError) return true;
+      if (this.loginError.isError || this.passwordError.isError) return true;
+      else return false;
+    },
+  },
+};
 </script>
 <style lang="scss" scoped>
 .conteiner {
@@ -204,7 +250,6 @@ export default {
     cursor: pointer;
     display: inline;
     text-decoration: none;
-
 
     &:hover {
       color: rgb(252, 213, 53);
