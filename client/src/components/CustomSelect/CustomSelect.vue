@@ -6,7 +6,6 @@
       }"><img class="custom-select__img" :alt="selectedOption"
               :src="`https://coinicons-api.vercel.app/api/icon/${selectedOption.toLowerCase()}`"/>{{ selectedOption }}
       </span>
-            <i :class="`fas fa-chevron-${isOpen ? 'up' : 'down'}`"></i>
         </div>
         <transition name="fade">
             <div class="options" v-if="isOpen">
@@ -38,6 +37,10 @@ export default {
             type: String,
             required: true,
         },
+        fromCurrency: {
+            type: String,
+            required: false,
+        }
     },
     data() {
         return {
@@ -49,7 +52,10 @@ export default {
             return this.selected || this.options[0];
         },
         filteredOptions() {
-            return this.options.filter((el) => el !== this.selected)
+            if (this.fromCurrency) {
+                return this.options.filter((el) => el !== this.fromCurrency).filter((el) => el !== this.selected);
+            }
+            return this.options.filter((el) => el !== this.selected);
         }
     },
     methods: {
@@ -83,6 +89,7 @@ export default {
     align-items: center;
     border: 1px solid #ccc;
     gap: 10px;
+    justify-content: center;
     border-radius: 18px;
     padding: 12px 15px;
     background-color: white;
@@ -114,7 +121,7 @@ export default {
   z-index: 1;
   top: 100%;
   left: 0;
-  width: calc(100% - 10px);
+  width: 100%;
   max-height: 150px;
   overflow-y: auto;
   border: 1px solid #ccc;

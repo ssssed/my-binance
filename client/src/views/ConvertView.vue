@@ -14,6 +14,7 @@
             <div class="form__group">
                 <label>Целевая валюта</label>
                 <custom-select v-model="toCurrency" :selected="toCurrency" :options="fromCurrencies"
+                               :from-currency="fromCurrency"
                                @update-selected="selectToCurrency"/>
             </div>
         </div>
@@ -33,8 +34,8 @@ export default {
     data() {
         return {
             currencies: ['BTC', 'ETH', 'LTC', 'XRP'], // список поддерживаемых валют
-            fromCurrencies: ['USDT'],
-            fromCurrency: 'BTC', // исходная валюта
+            fromCurrencies: ['USDT', 'BTC', 'ETH', 'LTC', 'XRP'],
+            fromCurrency: 'BTC', // исходная вал3юта
             toCurrency: 'USDT', // целевая валюта
             amount: 1, // количество исходной валюты
             exchangeRate: null, // курс обмена
