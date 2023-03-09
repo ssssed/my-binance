@@ -1,54 +1,116 @@
 <template>
-    <div class="page admin">
-        <form class="form" v-if="!isLogin" @keydown.enter="handleSubmit" @submit.prevent="handleSubmit">
-            <span v-if="isError" class="form__error">Неправильный логин или пароль</span>
-            <div class="form__controll">Логин: <input class="form__input" v-model="login" placeholder="логин"
-                                                      type="text"/></div>
-            <div class="form__controll">Пароль: <input class="form__input" v-model="password" placeholder="пароль"
-                                                       type="password"/></div>
-            <button class="form__submit" type="submit">Войти</button>
-        </form>
-        <div v-if="isLogin" class="content">
-          Авторизован
-        </div>
+  <div class="page admin">
+    <form
+      class="form"
+      v-if="!isLogin"
+      @keydown.enter="handleSubmit"
+      @submit.prevent="handleSubmit"
+    >
+      <span v-if="isError" class="form__error"
+        >Неправильный логин или пароль</span
+      >
+      <div class="form__controll">
+        Логин:
+        <input
+          class="form__input"
+          v-model="login"
+          placeholder="логин"
+          type="text"
+        />
+      </div>
+      <div class="form__controll">
+        Пароль:
+        <input
+          class="form__input"
+          v-model="password"
+          placeholder="пароль"
+          type="password"
+        />
+      </div>
+      <button class="form__submit" type="submit">Войти</button>
+    </form>
+    <div v-if="isLogin" class="content">
+      <h2 class="content__title">Админ панель</h2>
+      <div class="container">
+        <div class="users"></div>
+        <!-- количество новых пользователей -->
+        <div class="transactions"></div>
+        <!-- количество проведенных транзакций -->
+        <div class="transactions"></div>
+        <!-- прибиль от транзакций -->
+      </div>
+      <div class="history">
+        <h2 class="history__title">История транзакций</h2>
+        <div class="transactions"></div>
+      </div>
     </div>
+  </div>
 </template>
 
 <script>
-import {axiosService} from "@/api";
-
+import { axiosService } from "@/api";
 export default {
-    name: "AdminView",
-    data() {
-        return {
-            isLogin: false,
-            login: "",
-            password: "",
-            isError: false,
-        };
-    },
-    methods: {
-        async handleSubmit() {
-            try {
-                const response = await axiosService.post("/admin/auth", {
-                    username: this.login,
-                    password: this.password,
-                });
-                if (response.status === 200) {
-                    this.isError = false;
-                    this.isLogin = true;
-                    const adminToken = response.data.username + ":" + response.data.password;
-                    sessionStorage.setItem("adminToken", adminToken);
-                }
-            } catch (e) {
-                sessionStorage.clear();
-                this.isError = true;
-                console.error(e);
-            } finally {
-                this.password = this.login = "";
-            }
+  name: "AdminView",
+  data() {
+    return {
+      isLogin: false,
+      login: "",
+      password: "",
+      isError: false,
+    };
+  },
+  methods: {
+    async handleSubmit() {
+      try {
+        const response = await axiosService.post("/admin/auth", {
+          username: this.login,
+          password: this.password,
+        });
+        if (response.status === 200) {
+          this.isError = false;
+          this.isLogin = true;
+          const adminToken =
+            response.data.username + ":" + response.data.password;
+          sessionStorage.setItem("adminToken", adminToken);
         }
-    }
+      } catch (e) {
+        sessionStorage.clear();
+        this.isError = true;
+        console.error(e);
+      } finally {
+        this.password = this.login = "";
+      }
+    },
+  },
+  watch: {
+    async isLogin(updatedValue, oldValue) {
+      if (updatedValue) {
+        const adminToken = sessionStorage.getItem("adminToken");
+        try {
+          const [userResponse, transactionsResponse] = await Promise.all([
+            axiosService.get("/admin/users", {
+              headers: {
+                Authorization: adminToken,
+              },
+            }),
+            axiosService.get("/admin/transactions", {
+              headers: {
+                Authorization: adminToken,
+              },
+            }),
+          ]);
+          if (
+            userResponse.status === 200 &&
+            transactionsResponse.status === 200
+          ) {
+            console.log(userResponse.data, transactionsResponse.data);
+          }
+        } catch (error) {
+          console.error(error);
+        }
+      }
+    },
+  },
 };
 </script>
 

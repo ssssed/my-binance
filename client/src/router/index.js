@@ -42,7 +42,7 @@ const routes = [
     path: '/profile',
     name: 'profile',
     component: () =>
-      import(/* webpackChunkName: "about" */ '../views/AboutView.vue'),
+      import(/* webpackChunkName: "about" */ '../views/ProfileView.vue'),
     beforeEnter: requireAuth,
     meta: { requiresAuth: true },
   },
