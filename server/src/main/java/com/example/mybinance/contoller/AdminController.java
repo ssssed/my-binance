@@ -51,4 +51,13 @@ public class AdminController {
             return ResponseEntity.badRequest().body(e);
         }
     }
+
+    @DeleteMapping("/users/delete/{id}")
+    public ResponseEntity deleteUser(@RequestHeader("Authorization") String authHeader, @PathVariable int id) {
+        try {
+            return ResponseEntity.ok(adminService.deleteUser(authHeader, id));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Произошла какая-то ошибка");
+        }
+    }
 }

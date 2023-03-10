@@ -84,4 +84,19 @@ public class AdminService {
         }
         throw new ApiError("у вас недостаточно прав!");
     }
+
+    public List<UserEntity> deleteUser(String authToken, int id) throws ApiError {
+        List<String> authParse = List.of(authToken.split(":"));
+        UserEntity admin = login(authParse.get(0), authParse.get(1));
+        if(admin == null) {
+            throw new ApiError("У вас недостаточно прав");
+        }
+        String sql = "DELETE FROM public.users WHERE id = ?";
+        jdbcTemplate.update(sql, id);
+        try {
+            return getUsers(authToken);
+        } catch (ApiError e) {
+            throw new ApiError(e.getMessage());
+        }
+    }
 }
