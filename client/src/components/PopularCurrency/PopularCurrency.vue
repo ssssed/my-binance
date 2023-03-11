@@ -5,7 +5,11 @@
       <router-link class="link" to="/markets">
         <div class="button">
           <span class="text">Посмотреть больше рынков</span>
-          <img alt="accordion" class="accordion-img" src="@/assets/accordion.svg" />
+          <img
+            alt="accordion"
+            class="accordion-img"
+            src="@/assets/accordion.svg"
+          />
         </div>
       </router-link>
     </div>
@@ -16,17 +20,29 @@
         <div class="head">Изменение за 24ч</div>
         <div class="head">Капитализация</div>
       </div>
-      <div v-for="currency in currencyList" class="currency-item">
+      <div
+        v-for="currency in currencyList"
+        :key="currency.name"
+        class="currency-item"
+      >
         <div class="currency__header">
           <div class="currency__logo">
-            <img :alt="currency.name" :src="`https://coinicons-api.vercel.app/api/icon/${currency.symbol.toLowerCase()}`" class="currency__img" />
+            <img
+              :alt="currency.name"
+              :src="`https://coinicons-api.vercel.app/api/icon/${currency.symbol.toLowerCase()}`"
+              class="currency__img"
+            />
           </div>
           <p class="currency__name">{{ currency.name }}</p>
         </div>
         <div class="currency__last-price">$ {{ currency.price }}</div>
-        <div :class="{
-            'currency-percentage_up': currency.change >= 0
-          }" class="currency-percentage">{{ currency.change }}%
+        <div
+          :class="{
+            'currency-percentage_up': currency.change >= 0,
+          }"
+          class="currency-percentage"
+        >
+          {{ currency.change }}%
         </div>
         <div class="currency-capitalization">$ {{ currency.marketCap }}</div>
       </div>
@@ -43,29 +59,36 @@ export default {
     };
   },
   created() {
-    const ws = new WebSocket('wss://stream.binance.com:9443/ws/!ticker@arr')
+    const ws = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
 
-    ws.onmessage = event => {
-      const data = JSON.parse(event.data)
-      const topCurrencies = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'BUSDUSDT', 'XRPUSDT']
-      const filteredData = data.filter(currency => topCurrencies.includes(currency.s))
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      const topCurrencies = [
+        "BTCUSDT",
+        "ETHUSDT",
+        "BNBUSDT",
+        "BUSDUSDT",
+        "XRPUSDT",
+      ];
+      const filteredData = data.filter((currency) =>
+        topCurrencies.includes(currency.s)
+      );
 
-      this.currencyList = filteredData.map(currency => {
+      this.currencyList = filteredData.map((currency) => {
         return {
-          name: currency.s.replace('USDT', ''),
+          name: currency.s.replace("USDT", ""),
           price: parseFloat(currency.c).toFixed(2),
           change: parseFloat(currency.P).toFixed(2),
           marketCap: parseFloat(currency.q).toLocaleString(),
-          symbol: currency.s.slice(0, -4)
-        }
-      })
-    }
+          symbol: currency.s.slice(0, -4),
+        };
+      });
+    };
   },
 };
 </script>
 
 <style lang="scss" scoped>
-
 .popular-currency {
   margin-bottom: 80px;
 }
@@ -110,8 +133,8 @@ export default {
   padding-top: 64px;
 }
 
-
-.headers, .currency-item {
+.headers,
+.currency-item {
   display: grid;
   grid-template-columns: repeat(4, minmax(120px, 1fr));
   align-items: center;
@@ -120,8 +143,9 @@ export default {
 }
 
 .currency {
-
-  &-percentage, &-capitalization, &__last-price {
+  &-percentage,
+  &-capitalization,
+  &__last-price {
     text-align: center;
   }
 
@@ -166,7 +190,7 @@ export default {
 }
 
 .head {
-  color: #707A8A;
+  color: #707a8a;
   text-align: center;
 }
 </style>

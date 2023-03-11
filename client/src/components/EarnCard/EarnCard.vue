@@ -1,19 +1,19 @@
 <template>
   <div class="card">
-    <img alt=""
-         class="card__img"
-         :src="link" />
+    <img alt="" class="card__img" :src="link" />
     <h6 class="card__name">{{ name }}</h6>
     <p class="card__apr">
       APR
-      <span class="card__percent"
-      :class="{
-        'card__percent_up': percentMin >= 0
-      }">
-            {{percentMin}}%-{{percentMax}}%
-          </span>
+      <span
+        class="card__percent"
+        :class="{
+          card__percent_up: percentMin >= 0,
+        }"
+      >
+        {{ percentMin }}%-{{ percentMax }}%
+      </span>
     </p>
-    <button class="card__button">
+    <button class="card__button" @click="handleNavigate(name)">
       <img alt="next" class="card__next-btn" src="@/assets/accordion.svg" />
     </button>
   </div>
@@ -27,6 +27,24 @@ export default {
     link: String,
     percentMin: Number,
     percentMax: Number,
+  },
+  methods: {
+    handleNavigate(name) {
+      const queryParams = {
+        symbol: name,
+      };
+
+      // Объект текущего маршрута
+      const currentRoute = this.$router.currentRoute;
+
+      // Новый маршрут с добавленными параметрами
+      const newRoute = {
+        path: "/currency",
+        query: Object.assign({}, currentRoute.query, queryParams),
+      };
+
+      this.$router.push(newRoute);
+    },
   },
 };
 </script>
@@ -50,7 +68,7 @@ export default {
     transition: all 0.3s linear;
     border-color: rgb(252, 213, 53);
 
-  //  сделать кнопку такого же цвета как и бордер
+    //  сделать кнопку такого же цвета как и бордер
   }
 
   &__img {
@@ -72,7 +90,7 @@ export default {
     color: rgb(207, 48, 74);
 
     &_up {
-    color: rgb(3, 166, 109);
+      color: rgb(3, 166, 109);
     }
   }
 
