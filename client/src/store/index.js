@@ -3,6 +3,7 @@ import { createStore } from "vuex";
 export default createStore({
   state: {
     isAuth: false,
+    isAdminAuth: false,
     userInfo: {},
   },
   getters: {
@@ -12,6 +13,9 @@ export default createStore({
     getUserInfo(state) {
       return state.userInfo;
     },
+    getAdminAuthStatus(state) {
+      return state.isAdminAuth;
+    }
   },
   mutations: {
     updateAuthStatus(state, payload) {
@@ -20,6 +24,9 @@ export default createStore({
     updateUserInfo(state, payload) {
       state.userInfo = payload;
     },
+    updateAdminAuthStatus(state, payload) {
+      state.isAdminAuth = payload;
+    }
   },
   actions: {
     async changeAuthStatus({ commit }, payload) {
@@ -28,6 +35,9 @@ export default createStore({
     async changeUserInfo({ commit }, payload) {
       commit('updateUserInfo', payload);
     },
+    async changeAdminAuthStatus({commit}, payload) {
+      commit('updateAdminAuthStatus', payload);
+    }
   },
   modules: {},
 });

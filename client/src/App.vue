@@ -35,9 +35,13 @@ import { useStore } from "vuex";
 function setup() {
   const store = useStore();
   const mySessionData = JSON.parse(localStorage.getItem("userInfo"));
-
+  const isAdminAuth = sessionStorage.getItem("adminToken");
   if (mySessionData) {
     store.dispatch("changeAuthStatus", mySessionData);
+  }
+
+  if(isAdminAuth) {
+    store.dispatch("changeAdminAuthStatus", true);
   }
 }
 setup();

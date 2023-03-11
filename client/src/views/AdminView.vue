@@ -1,38 +1,20 @@
 <template>
   <div class="page admin">
-    <form
-      class="form"
-      v-if="!isLogin"
-      @keydown.enter="handleSubmit"
-      @submit.prevent="handleSubmit"
-    >
-      <span v-if="isError" class="form__error"
-        >Неправильный логин или пароль</span
-      >
-      <div class="form__controll">
-        Логин:
-        <input
-          class="form__input"
-          v-model="login"
-          placeholder="логин"
-          type="text"
-        />
-      </div>
-      <div class="form__controll">
-        Пароль:
-        <input
-          class="form__input"
-          v-model="password"
-          placeholder="пароль"
-          type="password"
-        />
-      </div>
-      <button class="form__submit" type="submit">Войти</button>
-    </form>
-    <div v-if="isLogin" class="content">
+    <admin-form v-if="!getAdminAuthStatus" />
+    <div v-if="getAdminAuthStatus" class="content">
       <h2 class="content__title">Админ панель</h2>
       <div class="container">
-        <div class="users"></div>
+        <div class="users">
+          <h2 class="users__title">Пользователи</h2>
+          <div class="users__container">
+            <user-info
+              v-for="(user, index) in users"
+              :key="index"
+              :user="user"
+              @updateUsers="handleUpdateUsers"
+            />
+          </div>
+        </div>
         <!-- количество новых пользователей -->
         <div class="transactions"></div>
         <!-- количество проведенных транзакций -->
@@ -49,67 +31,63 @@
 
 <script>
 import { axiosService } from "@/api";
+import { mapGetters } from "vuex";
+import UserInfo from "@/components/UserInfo/UserInfo.vue";
+import AdminForm from "@/components/AdminForm/AdminForm.vue";
 export default {
+  components: { UserInfo, AdminForm },
   name: "AdminView",
   data() {
     return {
-      isLogin: false,
-      login: "",
-      password: "",
-      isError: false,
+      users: [],
     };
   },
   methods: {
-    async handleSubmit() {
+    async getAdminData() {
+      const adminToken = sessionStorage.getItem("adminToken");
       try {
-        const response = await axiosService.post("/admin/auth", {
-          username: this.login,
-          password: this.password,
-        });
-        if (response.status === 200) {
-          this.isError = false;
-          this.isLogin = true;
-          const adminToken =
-            response.data.username + ":" + response.data.password;
-          sessionStorage.setItem("adminToken", adminToken);
+        const [userResponse, transactionsResponse] = await Promise.all([
+          axiosService.get("/admin/users", {
+            headers: {
+              Authorization: adminToken,
+            },
+          }),
+          axiosService.get("/admin/transactions", {
+            headers: {
+              Authorization: adminToken,
+            },
+          }),
+        ]);
+        if (
+          userResponse.status === 200 &&
+          transactionsResponse.status === 200
+        ) {
+          console.log(userResponse.data, transactionsResponse.data);
+          this.users = userResponse.data;
         }
-      } catch (e) {
-        sessionStorage.clear();
-        this.isError = true;
-        console.error(e);
-      } finally {
-        this.password = this.login = "";
+      } catch (error) {
+        console.error(error);
       }
+    },
+    handleUpdateUsers(users) {
+      this.users = users;
     },
   },
+  computed: mapGetters(["getAdminAuthStatus"]),
   watch: {
-    async isLogin(updatedValue, oldValue) {
+    async getAdminAuthStatus(updatedValue, oldValue) {
       if (updatedValue) {
-        const adminToken = sessionStorage.getItem("adminToken");
-        try {
-          const [userResponse, transactionsResponse] = await Promise.all([
-            axiosService.get("/admin/users", {
-              headers: {
-                Authorization: adminToken,
-              },
-            }),
-            axiosService.get("/admin/transactions", {
-              headers: {
-                Authorization: adminToken,
-              },
-            }),
-          ]);
-          if (
-            userResponse.status === 200 &&
-            transactionsResponse.status === 200
-          ) {
-            console.log(userResponse.data, transactionsResponse.data);
-          }
-        } catch (error) {
-          console.error(error);
-        }
+        this.getAdminData();
       }
     },
+    "$sessionStorage.adminToken": function (value) {
+      if (value) this.getAdminData();
+    },
+  },
+  mounted() {
+    if (this.getAdminAuthStatus || sessionStorage.getItem("adminToken")) {
+      this.getAdminData();
+    }
   },
 };
 </script>
@@ -121,77 +99,15 @@ export default {
   margin: 0 auto;
 }
 
-.form {
-  max-width: 300px;
-  margin: 40px auto 0;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.users {
+  &__title {
+    font-size: xx-large;
+  }
 
-  &__controll {
+  &__container {
     display: flex;
-    align-items: center;
-    text-align: center;
-    justify-content: space-between;
-  }
-
-  &__input {
-    max-width: 230px;
-    width: 100%;
-    color: rgb(30, 35, 41);
-    font-size: 14px;
-    padding-left: 12px;
-    padding-right: 12px;
-    outline: none;
-    background-color: inherit;
-    opacity: 1;
-    line-height: 1.6;
-    height: 48px;
-    border: 2px solid rgb(234, 236, 239);
-    border-radius: 4px;
-
-    &:focus {
-      border-color: rgb(240, 185, 11);
-    }
-  }
-
-  &__error {
-    color: red;
-    opacity: 0.8;
-  }
-
-  &__submit {
-    margin: 0px;
-    appearance: none;
-    user-select: none;
-    cursor: pointer;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: inline-flex;
-    -moz-box-align: center;
-    align-items: center;
-    -moz-box-pack: center;
-    justify-content: center;
-    box-sizing: border-box;
-    font-size: 16px;
-    font-family: inherit;
-    font-weight: 500;
-    text-align: center;
-    text-decoration: none;
-    outline: none;
-    padding: 12px 24px;
-    line-height: 24px;
-    min-width: 80px;
-    word-break: keep-all;
-    color: rgb(24, 26, 32);
-    border-radius: 4px;
-    min-height: 24px;
-    border: medium none;
-    background-image: none;
-    background-color: rgb(252, 213, 53);
-    white-space: normal;
-    width: 100%;
-    height: 48px;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 </style>
