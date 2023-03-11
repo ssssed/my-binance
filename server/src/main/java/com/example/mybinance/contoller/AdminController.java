@@ -1,5 +1,6 @@
 package com.example.mybinance.contoller;
 
+import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.entity.UserRequest;
 import com.example.mybinance.error.ApiError;
 import com.example.mybinance.service.AdminService;
@@ -58,6 +59,16 @@ public class AdminController {
             return ResponseEntity.ok(adminService.deleteUser(authHeader, id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Произошла какая-то ошибка");
+        }
+    }
+
+    @PatchMapping("/users/{id}")
+    public ResponseEntity updateUser(@PathVariable int id, @RequestBody UserEntity user) {
+        try {
+            adminService.updateUserInfo(user.getUsername(), user.getPassword(), user.getAvatar(), id);
+            return ResponseEntity.ok("Пользователь " + user.getUsername() + " обновлен");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Что-то пошло не так");
         }
     }
 }

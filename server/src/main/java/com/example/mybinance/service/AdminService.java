@@ -99,4 +99,9 @@ public class AdminService {
             throw new ApiError(e.getMessage());
         }
     }
+
+    public void updateUserInfo(String name, String password, String avatar, int id) {
+        String sql = "UPDATE public.users SET username = ?, password = ?, avatar = ? WHERE id = ?";
+        jdbcTemplate.update(sql, name, password, avatar, id);
+    }
 }
