@@ -62,6 +62,11 @@ const routes = [
     component: () =>
       import(/* webpackChunkName: "about" */ '../views/AdminView.vue'),
   },
+  {
+    path: '/currency',
+    name: 'currency',
+    component: () => import('../views/CurrencyView.vue'),
+  },
 ];
 
 const router = createRouter({
