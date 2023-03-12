@@ -37,7 +37,6 @@ public class UserService {
     }
 
     public UserData auth(String username, String password) throws ApiError {
-
         String sql = "SELECT COUNT(*) FROM users WHERE username = ? AND password = ?";
         if (jdbcTemplate.queryForObject(sql, Integer.class, username, password) == 1) {
             final UserEntity user = getUser(username, password);
@@ -45,14 +44,6 @@ public class UserService {
         } else
             throw new ApiError("Неправильный логин или пароль");
     }
-
-//    public void register(String username, String password) throws ApiError {
-//        if (isUserCreated(username)) {
-//            throw new ApiError("Такой пользователь с таким именем уже существует!");
-//        }
-//        String sql = "INSERT INTO users(username, password, avatar) VALUES (?, ?, ?)";
-//        jdbcTemplate.update(sql, username, password, null);
-//    }
 
     public UserData registerUser(String username, String password, String avatar, String walletName) {
         // Insert new user into 'users' table
@@ -92,7 +83,16 @@ public class UserService {
     }
 
     public UserData getUserInfo(UserEntity user) {
-        Integer walletId = jdbcTemplate.queryForObject("SELECT id FROM public.wallets WHERE name = ?", new Object[]{user.getUsername() + "Wallet"}, Integer.class);
+        String sql = "SELECT id FROM wallets WHERE \"userId\" = ?";
+        Integer walletId = jdbcTemplate.queryForObject(sql, new Object[]{user.getId()}, Integer.class);
         return new UserData(user.getId(), user.getUsername(), user.getAvatar(), walletId);
+    }
+
+    public void updateUserInfo(String name, String password, String avatar, int id) {
+        String sql = "UPDATE public.users SET username = ?, password = ?, avatar = ? WHERE id = ?";
+        String query = "UPDATE public.wallets SET name = ? WHERE id = ?";
+        jdbcTemplate.update(sql, name, password, avatar, id);
+        UserData user = getUserInfo(new UserEntity(id, name, password, avatar));
+        jdbcTemplate.update(query, name+"Wallet", user.getWalletId());
     }
 }

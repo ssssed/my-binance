@@ -2,6 +2,7 @@ package com.example.mybinance.contoller;
 
 import com.example.mybinance.entity.AddCurrencyRequest;
 import com.example.mybinance.entity.UserData;
+import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.entity.UserRequest;
 import com.example.mybinance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,16 @@ public class UserController {
             return ResponseEntity.ok(userService.registerUser(user.getUsername(), user.getPassword(), null, user.getUsername() + "Wallet"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Пользователь не был создан");
+        }
+    }
+
+    @PatchMapping("/{id}")
+    public ResponseEntity updateUser(@PathVariable int id, @RequestBody UserEntity user) {
+        try {
+            userService.updateUserInfo(user.getUsername(), user.getPassword(), user.getAvatar(), id);
+            return ResponseEntity.ok("Пользователь " + user.getUsername() + " обновлен");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Что-то пошло не так");
         }
     }
 }

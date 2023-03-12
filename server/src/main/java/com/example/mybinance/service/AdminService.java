@@ -1,6 +1,7 @@
 package com.example.mybinance.service;
 
 import com.example.mybinance.entity.TransactionEntity;
+import com.example.mybinance.entity.UserData;
 import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.error.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,12 @@ public class AdminService {
             return getUser(username, password);
         } else
             throw new ApiError("Неправильный логин или пароль");
+    }
+
+    public UserData getUserInfo(UserEntity user) {
+        String sql = "SELECT id FROM wallets WHERE \"userId\" = ?";
+        Integer walletId = jdbcTemplate.queryForObject(sql, new Object[]{user.getId()}, Integer.class);
+        return new UserData(user.getId(), user.getUsername(), user.getAvatar(), walletId);
     }
 
     public void create(String name, String password, String authHeader) throws ApiError {
@@ -102,6 +109,9 @@ public class AdminService {
 
     public void updateUserInfo(String name, String password, String avatar, int id) {
         String sql = "UPDATE public.users SET username = ?, password = ?, avatar = ? WHERE id = ?";
+        String query = "UPDATE public.wallets SET name = ? updatedAt = now() WHERE id = ?";
         jdbcTemplate.update(sql, name, password, avatar, id);
+        UserData user = getUserInfo(new UserEntity(id, name, password, avatar));
+        jdbcTemplate.update(query, user.getUsername()+"Wallet", user.getWalletId());
     }
 }
