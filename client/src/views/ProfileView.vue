@@ -138,6 +138,13 @@ export default {
     padding-left: 24px;
     padding-right: 24px;
   }
+
+  &__wallets {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, 220px);
+    gap: 15px;
+  }
 }
 
 .content {

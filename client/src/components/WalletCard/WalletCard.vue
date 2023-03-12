@@ -44,6 +44,7 @@ export default {
 .wallet {
   background-color: #fafafa;
   border-radius: 16px;
+  height: 158px;
 
   &__content {
     display: flex;
