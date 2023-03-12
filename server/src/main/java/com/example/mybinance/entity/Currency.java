@@ -18,6 +18,8 @@ public class Currency {
         this.updatedAt = updatedAt.toLocalDateTime();
     }
 
+    public Currency() {}
+
     public Currency(String name, String symbol, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.name = name;
         this.symbol = symbol;
