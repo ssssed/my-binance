@@ -20,6 +20,7 @@
         <div class="head">Изменение за 24ч</div>
         <div class="head">Капитализация</div>
       </div>
+      <spin v-if="isLoading" />
       <div
         v-for="currency in currencyList"
         :key="currency.name"
@@ -51,17 +52,21 @@
 </template>
 
 <script>
+import Spin from "../Spin/Spin.vue";
 export default {
+  components: { Spin },
   name: "PopularCurrency",
   data() {
     return {
+      ws: null,
       currencyList: [],
+      isLoading: true,
     };
   },
   created() {
-    const ws = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
+    this.ws = new WebSocket("wss://stream.binance.com:9443/ws/!ticker@arr");
 
-    ws.onmessage = (event) => {
+    this.ws.onmessage = (event) => {
       const data = JSON.parse(event.data);
       const topCurrencies = [
         "BTCUSDT",
@@ -74,6 +79,7 @@ export default {
         topCurrencies.includes(currency.s)
       );
 
+      this.isLoading = false;
       this.currencyList = filteredData.map((currency) => {
         return {
           name: currency.s.replace("USDT", ""),
@@ -84,6 +90,9 @@ export default {
         };
       });
     };
+  },
+  unmounted() {
+    this.ws.close();
   },
 };
 </script>

@@ -9,7 +9,8 @@
         </button>
         <button class="profile__button profile__logout">Выйти</button>
       </div>
-      <div class="profile__wallets">
+      <spin v-if="isLoading" />
+      <div v-if="!isLoading" class="profile__wallets">
         <wallet-card
           v-for="wallet in wallets"
           :key="wallet.currencyId"
@@ -24,11 +25,13 @@
 import { axiosService } from "@/api";
 import { mapActions, mapGetters } from "vuex";
 import WalletCard from "@/components/WalletCard/WalletCard.vue";
+import Spin from "@/components/Spin/Spin.vue";
 export default {
-  components: { WalletCard },
+  components: { WalletCard, Spin },
   name: "profile",
   data() {
     return {
+      isLoading: true,
       wallets: [],
     };
   },
@@ -40,6 +43,7 @@ export default {
       );
       if (response.status === 200) {
         this.wallets = response.data;
+        this.isLoading = false;
       }
     } catch (error) {
       console.error(error);
