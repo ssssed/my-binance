@@ -1,7 +1,5 @@
 package com.example.mybinance.contoller;
 
-import com.example.mybinance.entity.AddCurrencyRequest;
-import com.example.mybinance.entity.UserData;
 import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.entity.UserRequest;
 import com.example.mybinance.service.UserService;
@@ -28,9 +26,7 @@ public class UserController {
 
     @PostMapping("/create")
     public ResponseEntity register(@RequestBody UserRequest user) {
-
         try {
-//            userService.register(user.getUsername(), user.getPassword());
             return ResponseEntity.ok(userService.registerUser(user.getUsername(), user.getPassword(), null, user.getUsername() + "Wallet"));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Пользователь не был создан");
@@ -42,6 +38,15 @@ public class UserController {
         try {
             userService.updateUserInfo(user.getUsername(), user.getPassword(), user.getAvatar(), id);
             return ResponseEntity.ok("Пользователь " + user.getUsername() + " обновлен");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Что-то пошло не так");
+        }
+    }
+
+    @GetMapping("/wallets/{id}")
+    public ResponseEntity getWallets(@PathVariable int id) {
+        try {
+            return ResponseEntity.ok(userService.getWallets(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Что-то пошло не так");
         }

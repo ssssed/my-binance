@@ -3,6 +3,7 @@ package com.example.mybinance.service;
 import com.example.mybinance.entity.Currency;
 import com.example.mybinance.entity.UserData;
 import com.example.mybinance.entity.UserEntity;
+import com.example.mybinance.entity.Wallet;
 import com.example.mybinance.error.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -46,20 +47,16 @@ public class UserService {
     }
 
     public UserData registerUser(String username, String password, String avatar, String walletName) {
-        // Insert new user into 'users' table
+
         jdbcTemplate.update("INSERT INTO public.users (username, password, avatar) VALUES (?, ?, ?)", username, password, avatar);
 
-        // Get the ID of the newly created user
         Integer userId = jdbcTemplate.queryForObject("SELECT id FROM public.users WHERE username = ?", new Object[]{username}, Integer.class);
 
-        // Insert new wallet into 'wallets' table
         jdbcTemplate.update("INSERT INTO public.wallets (name, \"userId\", \"createdAt\", \"updatedAt\") VALUES (?, ?, NOW(), NOW())", walletName, userId);
 
-        // Get the ID of the newly created wallet
         Integer walletId = jdbcTemplate.queryForObject("SELECT id FROM public.wallets WHERE name = ?", new Object[]{walletName}, Integer.class);
 
-        // Insert new wallet currency into 'wallet_currencies' table for each currency
-        List<Currency> currencies = getAllCurrencies(); // assume this method retrieves all available currencies
+        List<Currency> currencies = getAllCurrencies();
         for (Currency currency : currencies) {
             jdbcTemplate.update("INSERT INTO public.wallet_currencies (\"walletId\", \"currencyId\", \"value\", \"createdAt\", \"updatedAt\") VALUES (?, ?, 0, NOW(), NOW())", walletId, currency.getId());
         }
@@ -93,6 +90,32 @@ public class UserService {
         String query = "UPDATE public.wallets SET name = ? WHERE id = ?";
         jdbcTemplate.update(sql, name, password, avatar, id);
         UserData user = getUserInfo(new UserEntity(id, name, password, avatar));
-        jdbcTemplate.update(query, name+"Wallet", user.getWalletId());
+        jdbcTemplate.update(query, name + "Wallet", user.getWalletId());
+    }
+
+    public List<Wallet> getWallets(int id) {
+        String query = "SELECT * FROM public.wallet_currencies WHERE \"walletId\" = ?";
+        String sql = "SELECT * FROM public.currencies WHERE id = ?";
+//        Получение всех валют с их количеством
+        List<Wallet> wallets = jdbcTemplate.query(query, (rs, rowNum) -> new Wallet(
+                rs.getInt("walletId"),
+                rs.getInt("currencyId"),
+                rs.getDouble("value")
+        ), id);
+// расшифровка каждой валюты
+        for (Wallet wallet: wallets) {
+            System.out.println(wallet.getCurrencyId());
+            Currency currency = jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
+                            new Currency(
+                                    rs.getLong("id"),
+                                    rs.getString("name"),
+                                    rs.getString("symbol"),
+                                    rs.getTimestamp("createdAt"),
+                                    rs.getTimestamp("updatedAt"))
+                    , wallet.getCurrencyId());
+            wallet.setName(currency.getName());
+            wallet.setSymbol(currency.getSymbol());
+        }
+        return wallets;
     }
 }
