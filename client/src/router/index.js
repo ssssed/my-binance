@@ -67,6 +67,10 @@ const routes = [
     name: 'currency',
     component: () => import('../views/CurrencyView.vue'),
   },
+  {
+    path: '/:catchAll(.*)',
+    component: () => import('../views/NotFoundView.vue'),
+  },
 ];
 
 const router = createRouter({
