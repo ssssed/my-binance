@@ -1,10 +1,10 @@
-import { createStore } from "vuex";
+import { createStore } from 'vuex';
 
 export default createStore({
   state: {
     isAuth: false,
     isAdminAuth: false,
-    userInfo: {},
+    userInfo: JSON.parse(localStorage.getItem('userInfo')) || {},
   },
   getters: {
     getAuthStatus(state) {
@@ -15,18 +15,20 @@ export default createStore({
     },
     getAdminAuthStatus(state) {
       return state.isAdminAuth;
-    }
+    },
   },
   mutations: {
     updateAuthStatus(state, payload) {
       state.isAuth = payload;
     },
     updateUserInfo(state, payload) {
+      localStorage.removeItem('userInfo');
+      localStorage.setItem('userInfo', JSON.stringify(payload));
       state.userInfo = payload;
     },
     updateAdminAuthStatus(state, payload) {
       state.isAdminAuth = payload;
-    }
+    },
   },
   actions: {
     async changeAuthStatus({ commit }, payload) {
@@ -35,9 +37,9 @@ export default createStore({
     async changeUserInfo({ commit }, payload) {
       commit('updateUserInfo', payload);
     },
-    async changeAdminAuthStatus({commit}, payload) {
+    async changeAdminAuthStatus({ commit }, payload) {
       commit('updateAdminAuthStatus', payload);
-    }
+    },
   },
   modules: {},
 });
