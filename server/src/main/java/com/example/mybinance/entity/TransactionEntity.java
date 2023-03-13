@@ -2,16 +2,11 @@ package com.example.mybinance.entity;
 
 import java.sql.Timestamp;
 
-enum TransactionType {
-    BUY,
-    SELL
-}
-
 public class TransactionEntity {
     private Long id;
     private Double amount;
     private Double price;
-    private TransactionType type;
+    private String type;
     private Timestamp createdAt;
     private Timestamp updatedAt;
     private Long walletId;
@@ -21,7 +16,7 @@ public class TransactionEntity {
         this.id = id;
         this.amount = amount;
         this.price = price;
-        this.type = TransactionType.valueOf(type);
+        this.type = type;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.walletId = walletId;
@@ -52,11 +47,11 @@ public class TransactionEntity {
         this.price = price;
     }
 
-    public TransactionType getType() {
+    public String getType() {
         return type;
     }
 
-    public void setType(TransactionType type) {
+    public void setType(String type) {
         this.type = type;
     }
 

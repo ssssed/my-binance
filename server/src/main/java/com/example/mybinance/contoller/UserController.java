@@ -1,7 +1,9 @@
 package com.example.mybinance.contoller;
 
+import com.example.mybinance.entity.TradeRequest;
 import com.example.mybinance.entity.UserEntity;
 import com.example.mybinance.entity.UserRequest;
+import com.example.mybinance.error.ApiError;
 import com.example.mybinance.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -49,6 +51,19 @@ public class UserController {
             return ResponseEntity.ok(userService.getWallets(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Что-то пошло не так");
+        }
+    }
+
+    @PatchMapping("/trade")
+    public ResponseEntity trade(@RequestBody TradeRequest trade) {
+        try {
+            userService.tradeWallet(trade.getWalletId(), trade.getSymbol(), trade.getValue());
+            return ResponseEntity.ok("успех!");
+        } catch (ApiError error) {
+            return ResponseEntity.badRequest().body("У вас недостаточно средств!");
+        }
+        catch (Exception e) {
+            return ResponseEntity.badRequest().body("Транзакция не прошла!");
         }
     }
 }

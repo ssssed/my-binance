@@ -54,4 +54,15 @@ public class Wallet {
     public void setName(String name) {
         this.name = name;
     }
+
+    @Override
+    public String toString() {
+        return "Wallet{" +
+                "walletId=" + walletId +
+                ", currencyId=" + currencyId +
+                ", value=" + value +
+                ", symbol='" + symbol + '\'' +
+                ", name='" + name + '\'' +
+                '}';
+    }
 }

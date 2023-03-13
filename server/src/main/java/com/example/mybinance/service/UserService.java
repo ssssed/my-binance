@@ -1,9 +1,6 @@
 package com.example.mybinance.service;
 
-import com.example.mybinance.entity.Currency;
-import com.example.mybinance.entity.UserData;
-import com.example.mybinance.entity.UserEntity;
-import com.example.mybinance.entity.Wallet;
+import com.example.mybinance.entity.*;
 import com.example.mybinance.error.ApiError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -93,7 +92,7 @@ public class UserService {
         jdbcTemplate.update(query, name + "Wallet", user.getWalletId());
     }
 
-    public List<Wallet> getWallets(int id) {
+    public List<Wallet> getWallets(int walletId) {
         String query = "SELECT * FROM public.wallet_currencies WHERE \"walletId\" = ?";
         String sql = "SELECT * FROM public.currencies WHERE id = ?";
 //        Получение всех валют с их количеством
@@ -101,10 +100,9 @@ public class UserService {
                 rs.getInt("walletId"),
                 rs.getInt("currencyId"),
                 rs.getDouble("value")
-        ), id);
+        ), walletId);
 // расшифровка каждой валюты
-        for (Wallet wallet: wallets) {
-            System.out.println(wallet.getCurrencyId());
+        for (Wallet wallet : wallets) {
             Currency currency = jdbcTemplate.queryForObject(sql, (rs, rowNum) ->
                             new Currency(
                                     rs.getLong("id"),
@@ -117,5 +115,50 @@ public class UserService {
             wallet.setSymbol(currency.getSymbol());
         }
         return wallets;
+    }
+
+    public void addTransaction(double amount, double price, String type, int walletId, int currencyId) {
+        String sql = "INSERT INTO transactions (amount, price, \"createdAt\", \"updatedAt\", \"walletId\", \"currencyId\", type) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        LocalDateTime now = LocalDateTime.now(); // получаем текущую дату и время
+        jdbcTemplate.update(sql, amount, price, Timestamp.valueOf(now), Timestamp.valueOf(now), walletId, currencyId, type);
+    }
+
+    public void tradeWallet(int walletId, String currencySymbol, double value) throws ApiError {
+        String query = "SELECT * FROM public.wallet_currencies WHERE \"walletId\" = ? AND \"currencyId\" = ?";
+        String sql = "SELECT id FROM currencies WHERE symbol = ?";
+
+        Integer currencyId = jdbcTemplate.queryForObject(sql, Integer.class, currencySymbol);
+        String type;
+        List<Wallet> wallets = jdbcTemplate.query(query, (rs, rowNum) -> new Wallet(
+                rs.getInt("walletId"),
+                rs.getInt("currencyId"),
+                rs.getDouble("value")
+        ), walletId, currencyId);
+        System.out.println(wallets);
+        Wallet wallet;
+//        если кошелька с такой валютой нет, создаем его и выполняем операции дальше
+        if (wallets.isEmpty()) {
+            jdbcTemplate.update("INSERT INTO public.wallet_currencies (value, \"createdAt\", \"updatedAt\", \"walletId\", \"currencyId\") " +
+                    "VALUES (?, now(), now(), ?, ?)", 0.0, walletId, currencyId);
+            wallets = jdbcTemplate.query(query, (rs, rowNum) -> new Wallet(
+                    rs.getInt("walletId"),
+                    rs.getInt("currencyId"),
+                    rs.getDouble("value")
+            ), walletId, currencyId);
+        }
+        wallet = wallets.get(0);
+
+        if (value < 0) {
+            type = "SELL";
+            if (wallet.getValue() + value < 0) throw new ApiError("у вас недостаточно средств");
+        } else type = "BUY";
+
+        double sumWithPercent = wallet.getValue() + (value * 0.1);
+        wallet.setValue(sumWithPercent);
+
+        String updateQuery = "UPDATE wallet_currencies SET value = ? WHERE \"currencyId\" = ? AND \"walletId\" = ?";
+        jdbcTemplate.update(updateQuery, wallet.getValue(), currencyId, walletId);
+
+        addTransaction(value, value + (value * 0.1), type, walletId, currencyId);
     }
 }
