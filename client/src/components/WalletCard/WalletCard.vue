@@ -9,7 +9,7 @@
         />
         <h5 class="wallet__symbol">{{ wallet.symbol }}</h5>
       </div>
-      <p class="wallet__currency">Количество: {{ wallet.value }}</p>
+      <p class="wallet__currency">Количество: {{ wallet.value.toFixed(8) }}</p>
       <button class="wallet__button" @click="handleSellWallet">продать</button>
     </div>
   </div>
