@@ -134,7 +134,6 @@ public class UserService {
                 rs.getInt("currencyId"),
                 rs.getDouble("value")
         ), walletId, currencyId);
-        System.out.println(wallets);
         Wallet wallet;
 //        если кошелька с такой валютой нет, создаем его и выполняем операции дальше
         if (wallets.isEmpty()) {

@@ -12,6 +12,8 @@ public class TransactionEntity {
     private Long walletId;
     private Long currencyId;
 
+    private String symbol;
+
     public TransactionEntity(Long id, Double amount, Double price, String type, Timestamp createdAt, Timestamp updatedAt, Long walletId, Long currencyId) {
         this.id = id;
         this.amount = amount;
@@ -85,6 +87,14 @@ public class TransactionEntity {
 
     public void setCurrencyId(Long currencyId) {
         this.currencyId = currencyId;
+    }
+
+    public String getSymbol() {
+        return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+        this.symbol = symbol;
     }
 }
 

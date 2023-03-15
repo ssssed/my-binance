@@ -78,7 +78,7 @@ public class AdminService {
         UserEntity admin = getUser(adminData.get(0), adminData.get(1));
         if (admin != null) {
             String selectAll = "SELECT * FROM transactions";
-            return jdbcTemplate.query(selectAll, (rs, rowNum) -> new TransactionEntity(
+            List<TransactionEntity> transactionEntities = jdbcTemplate.query(selectAll, (rs, rowNum) -> new TransactionEntity(
                     rs.getLong("id"),
                     rs.getDouble("amount"),
                     rs.getDouble("price"),
@@ -88,6 +88,12 @@ public class AdminService {
                     rs.getLong("walletId"),
                     rs.getLong("currencyId")
             ));
+            String addSymbol = "SELECT symbol FROM currencies WHERE id = ?";
+            for (TransactionEntity transaction : transactionEntities) {
+                String symbol = jdbcTemplate.queryForObject(addSymbol, String.class, transaction.getCurrencyId());
+                transaction.setSymbol(symbol);
+            }
+            return  transactionEntities;
         }
         throw new ApiError("у вас недостаточно прав!");
     }
@@ -95,7 +101,7 @@ public class AdminService {
     public List<UserEntity> deleteUser(String authToken, int id) throws ApiError {
         List<String> authParse = List.of(authToken.split(":"));
         UserEntity admin = login(authParse.get(0), authParse.get(1));
-        if(admin == null) {
+        if (admin == null) {
             throw new ApiError("У вас недостаточно прав");
         }
         String sql = "DELETE FROM public.users WHERE id = ?";
@@ -112,6 +118,6 @@ public class AdminService {
         String query = "UPDATE public.wallets SET name = ? updatedAt = now() WHERE id = ?";
         jdbcTemplate.update(sql, name, password, avatar, id);
         UserData user = getUserInfo(new UserEntity(id, name, password, avatar));
-        jdbcTemplate.update(query, user.getUsername()+"Wallet", user.getWalletId());
+        jdbcTemplate.update(query, user.getUsername() + "Wallet", user.getWalletId());
     }
 }
