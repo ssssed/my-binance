@@ -15,15 +15,31 @@
             />
           </div>
         </div>
-        <!-- количество новых пользователей -->
-        <div class="transactions"></div>
-        <!-- количество проведенных транзакций -->
-        <div class="transactions"></div>
-        <!-- прибиль от транзакций -->
+        <div class="transaction-count">
+          Количество проведенных транзакций за все время:
+          {{ transactionsCount }}
+        </div>
       </div>
       <div class="history">
         <h2 class="history__title">История транзакций</h2>
-        <div class="transactions"></div>
+        <div class="transactions">
+          <div
+            v-for="transaction in transactions"
+            :key="transaction.id"
+            class="transaction"
+          >
+            <span class="transaction__type">{{ transaction.type }}</span>
+            <span
+              :style="{
+                color: transaction.price > 0 ? 'green' : 'red',
+              }"
+              >{{ transaction.price }}
+              <span class="transaction__symbol">{{
+                transaction.symbol
+              }}</span></span
+            >
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -40,6 +56,7 @@ export default {
   data() {
     return {
       users: [],
+      transactions: [],
     };
   },
   methods: {
@@ -64,6 +81,7 @@ export default {
         ) {
           console.log(userResponse.data, transactionsResponse.data);
           this.users = userResponse.data;
+          this.transactions = transactionsResponse.data;
         }
       } catch (error) {
         console.error(error);
@@ -73,7 +91,15 @@ export default {
       this.users = users;
     },
   },
-  computed: mapGetters(["getAdminAuthStatus"]),
+  computed: {
+    ...mapGetters(["getAdminAuthStatus"]),
+    transactionsCount() {
+      return this.transactions.length;
+    },
+    transactionsProfit() {
+      return this.transactions.reduce((acc, item) => acc + item.price, 0);
+    },
+  },
   watch: {
     async getAdminAuthStatus(updatedValue, oldValue) {
       if (updatedValue) {
@@ -108,6 +134,27 @@ export default {
     display: flex;
     flex-direction: column;
     gap: 10px;
+  }
+}
+
+.transactions {
+  padding-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, 300px);
+  gap: 10px;
+  margin: 0 auto;
+}
+
+.transaction {
+  display: flex;
+  gap: 5px;
+
+  &-count {
+    padding: 10px 0;
+  }
+
+  &__symbol {
+    color: black;
   }
 }
 </style>
