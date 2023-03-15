@@ -1,5 +1,5 @@
 <template>
-  <div class="card">
+  <div class="card" @click="handleNavigate(name)">
     <img alt="" class="card__img" :src="link" />
     <h6 class="card__name">{{ name }}</h6>
     <p class="card__apr">
