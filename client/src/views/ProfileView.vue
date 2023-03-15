@@ -2,12 +2,11 @@
   <div class="page profile">
     <div class="content">
       <div class="profile__data">
-        <img class="profile__img" :src="getUserInfo.avatar" alt="avatar" />
+        <img class="profile__img" :src="profileImage" alt="avatar" />
         <h2 class="profile__name">{{ getUserInfo.username }}</h2>
-        <button class="profile__button profile__update">
-          Изменить профиль
+        <button class="profile__button profile__logout" @click="handleLogout">
+          Выйти
         </button>
-        <button class="profile__button profile__logout">Выйти</button>
       </div>
       <spin v-if="isLoading" />
       <div v-if="!isLoading" class="profile__wallets">
@@ -35,7 +34,15 @@ export default {
       wallets: [],
     };
   },
-  computed: mapGetters(["getUserInfo"]),
+  computed: {
+    ...mapGetters(["getUserInfo"]),
+    profileImage() {
+      console.log(this.getUserInfo.avatar, typeof this.getUserInfo.avatar);
+      if (this.getUserInfo.avatar === "null")
+        return require("../assets/default-profile-img.png");
+      return this.getUserInfo.avatar;
+    },
+  },
   async created() {
     try {
       const response = await axiosService.get(
@@ -55,6 +62,7 @@ export default {
       this.changeAuthStatus(false);
       this.changeUserInfo({});
       localStorage.removeItem("userInfo");
+      this.$router.push({ name: "home" });
     },
   },
 };
