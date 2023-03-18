@@ -38,7 +38,7 @@ export default {
     ...mapGetters(["getUserInfo"]),
     profileImage() {
       console.log(this.getUserInfo.avatar, typeof this.getUserInfo.avatar);
-      if (this.getUserInfo.avatar === "null")
+      if (this.getUserInfo.avatar === "null" || this.getUserInfo.avatar === null)
         return require("../assets/default-profile-img.png");
       return this.getUserInfo.avatar;
     },

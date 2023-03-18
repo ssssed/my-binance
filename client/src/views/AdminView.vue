@@ -29,6 +29,7 @@
             class="transaction"
           >
             <span class="transaction__type">{{ transaction.type }}</span>
+            <div class="transaction"></div>
             <span
               :style="{
                 color: transaction.price > 0 ? 'green' : 'red',
